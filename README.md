@@ -34,16 +34,16 @@ for i in range(1,N_mice+1):
                 x.append(vx)
                 y.append(vy)
                 #retrieve treatment
-                treatement=data[5]
+                treatment=data[5]
         #get next line
         line=fp.readline()           
     fp.close()
     clr="#0000FF"
     if treatment =="ABX" :
         clr = "#FF0000"
-    axes.plot(x, y, abel=mouse_id, color=clr ,alpha=0.5)
+    axes.plot(x, y, label=mouse_id, color=clr ,alpha=0.5)
     
     
 figure.legend(loc='right')
-figure.savefig("out.png", dpi=150)
+figure.savefig("out.png", dpi=150))
 figure.savefig("out.png")
