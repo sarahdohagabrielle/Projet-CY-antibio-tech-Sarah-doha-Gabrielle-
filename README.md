@@ -3,108 +3,109 @@ On étudie comment un traitement antibiotique donné à des souris au début de 
 
 from matplotlib import pyplot as plt
 import math
+import random  # <--- ajouté pour le jitter
 
 
-figure, axes,=plt.subplots()
-
-N_mice=16
-# graphique 1
-#for mouse_id in mice :
-for i in range(1,N_mice+1):
-    mouse_id='00'+str(i)
-    mouse_id=mouse_id[-3:]
-    mouse_id='ABX'+ mouse_id
-    treatment='?'
-    x=[]
-    y=[]
-    fp=open('data_small.csv')
-    #remove first line
-    line=fp.readline()
-    #get read of 1st data line
-    line=fp.readline()
-    while line!='':
-        line=line.replace('\n','')
-        data=line.split(';')
-        if len(data)==11:
-            #process to retrieve mouse data
-            if data[4]==mouse_id:
-                vx=int(data[7])
-                vy=math.log10(float(data[8]))
-                print(line)
-                #add x and y
-                x.append(vx)
-                y.append(vy)
-                #retrieve treatment
-                treatment=data[5]
-        #get next line
-        line=fp.readline()           
-    fp.close()
-    clr="#0000FF"
-    if treatment =="ABX" :
-        clr = "#FF0000"
-    axes.plot(x, y, label=mouse_id, color=clr ,alpha=0.5)
-# liste violon 
-cecal_no  = []
 cecal_abx = []
-ileal_no  = []
+cecal_plb = []
 ileal_abx = []
+ileal_plb = []
+souris_fecal = {} 
 
-fp = open('data_small.csv')
-fp.readline()  # skip header
-line = fp.readline()
+
+file_name = input("Please enter the file name: ")
+fd = open(file_name, "r")
+fd.readline()      # saute l'en-tête
+line = fd.readline()
 
 while line != '':
-    line = line.replace('\n', '')
-    data = line.split(';')
+    line = line.replace("\n", "")
+    data = line.split(";")
+     
+ 
+    nom_souris = data[4]
+    traitement = data[5]
+    jour = int(data[7])
+    valeur = math.log10(float(data[8]) + 1)
 
-    if len(data) == 11:
-        sample_type = data[2].strip().lower()   # cecal / ileal
-        treatment   = data[5]
-        val = float(data[8])
+    
+    if data[2] == 'cecal':
+        if traitement == 'ABX':
+            cecal_abx.append(valeur)
+        else:
+            cecal_plb.append(valeur)
+            
+   
+    if data[2] == 'ileal':
+        if traitement == 'ABX':
+            ileal_abx.append(valeur)
+        else:
+            ileal_plb.append(valeur)
 
-        if val > 0:
-            vy = math.log10(val)
+   
+    if data[2] == 'fecal':
+        if nom_souris not in souris_fecal:
+            # Bleu pour Placebo, Orange pour ABX
+            couleur = '#ff7f0e' if traitement == 'ABX' else '#1f77b4'
+            souris_fecal[nom_souris] = {'x': [], 'y': [], 'c': couleur}
+        souris_fecal[nom_souris]['x'].append(jour)
+        souris_fecal[nom_souris]['y'].append(valeur)
+    
+    line = fd.readline()
+fd.close()
 
-            if sample_type == "cecal":
-                if treatment == "ABX":
-                    cecal_abx.append(vy)
-                else:
-                    cecal_no.append(vy)
+# GRAPHIQUE CECAL
+plt.figure(figsize=(6, 5))
+v = plt.violinplot([cecal_abx, cecal_plb])
 
-            elif sample_type == "ileal":
-                if treatment == "ABX":
-                    ileal_abx.append(vy)
-                else:
-                    ileal_no.append(vy)
+# Couleurs : ABX (index 0) en orange, Placebo (index 1) en bleu
+v['bodies'][0].set_facecolor('#ffcc99')
+v['bodies'][1].set_facecolor('#6699ff')
 
-    line = fp.readline()
+# Ajout des points gris avec jitter horizontal
+x_abx = [1 + random.uniform(-0.10, 0.10) for _ in cecal_abx]
+x_plb = [2 + random.uniform(-0.10, 0.10) for _ in cecal_plb]
+plt.scatter(x_abx, cecal_abx, color='orange', alpha=0.8, s=30, zorder=3)
+plt.scatter(x_plb, cecal_plb, color='blue', alpha=0.8, s=30, zorder=3)
 
-fp.close()
+plt.title("Cecal live bacteria")
+plt.legend(['Placebo', 'ABX'], loc='lower right')
+plt.xlabel("Treatment")
+plt.ylabel("log10(live bacteria/wet g)")
+plt.grid(axis='y', linestyle='--', alpha=0.3)
+plt.savefig("cecal_resultat.png")
 
-# graphique 2 
-fig_cecal, ax_cecal = plt.subplots()
-ax_cecal.violinplot([cecal_no, cecal_abx], showmedians=True)
+# GRAPHIQUE ILEAL
+plt.figure(figsize=(6, 5))
+v = plt.violinplot([ileal_abx, ileal_plb])
 
-ax_cecal.set_xticks([1, 2])
-ax_cecal.set_xticklabels(["No ABX", "ABX"])
-ax_cecal.set_ylabel("log10(live bacteria / wet g)")
-ax_cecal.set_title("Cecal live bacteria")
+v['bodies'][0].set_facecolor('#ffcc99')
+v['bodies'][1].set_facecolor('#6699ff')
 
-fig_cecal.tight_layout()
-fig_cecal.savefig("violin_cecal.png", dpi=150)
+# Points avec jitter
+x_abx = [1 + random.uniform(-0.08, 0.08) for _ in ileal_abx]
+x_plb = [2 + random.uniform(-0.08, 0.08) for _ in ileal_plb]
+plt.scatter(x_abx, ileal_abx, color='orange', alpha=0.8, s=30, zorder=3)
+plt.scatter(x_plb, ileal_plb, color='blue', alpha=0.8, s=30, zorder=3)
 
+plt.title("Ileal live bacteria")
+plt.legend(['Placebo', 'ABX'], loc='lower right')
+plt.xlabel("Treatment")
+plt.ylabel("log10(live bacteria/wet g)")
+plt.grid(axis='y', linestyle='--', alpha=0.3)
+plt.savefig("ileal_resultat.png")
 
-#grafique 3
-fig_ileal, ax_ileal = plt.subplots()
-ax_ileal.violinplot([ileal_no, ileal_abx], showmedians=True)
-
-ax_ileal.set_xticks([1, 2])
-ax_ileal.set_xticklabels(["No ABX", "ABX"])
-ax_ileal.set_ylabel("log10(live bacteria / wet g)")
-ax_ileal.set_title("Ileal live bacteria")
-
-fig_ileal.tight_layout()
-fig_ileal.savefig("violin_ileal.png", dpi=150)
+# GRAPHIQUE FECAL
+plt.figure(figsize=(8, 6))
+for nom in souris_fecal:
+    infos = souris_fecal[nom]
+    plt.plot(infos['x'], infos['y'], color=infos['c'], alpha=0.4)
+plt.legend(['placebo', 'ABX'], loc='upper right')
+plt.title("Fecal live bacteria")
+plt.xlabel("washout day")
+plt.grid(linestyle='--', alpha=0.3)
+plt.ylabel("log10(live bacteria/wet g)")
+plt.savefig("fecal_resultat.png")
 
 plt.show()
 
