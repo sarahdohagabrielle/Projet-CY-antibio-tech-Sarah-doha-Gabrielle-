@@ -1,6 +1,6 @@
 ## Overview
 
-This project analyzes microbiome data from mice. It reads CSV files containing bacterial counts from different sample types (fecal, cecal, ileal) and generates **plots** and **CSV outputs** for each type.
+This project analyzes microbiome data from mice. It reads CSV files containing bacterial counts from different sample types (fecal, cecal, ileal) and generates plotsand CSV outputs for each type.
 
 ---
 
@@ -52,9 +52,9 @@ M2;cecal;Placebo;1;8000
 2. It reads the input CSV file
 3. Generates:
 
-   * **Fecal line plot** and CSV
-   * **Cecal violin plot** and CSV
-   * **Ileal violin plot** and CSV
+   * Fecal line plot and CSV
+   * Cecal violin plot and CSV
+   * Ileal violin plot and CSV
 4. Saves outputs in `output/` and `images/`
 
 ---
