@@ -1,6 +1,6 @@
 ## Overview
 
-This project analyzes microbiome data from mice. It reads CSV files containing bacterial counts from different sample types (fecal, cecal, ileal) and generates plotsand CSV outputs for each type.
+This project analyzes microbiome data from mice. It reads CSV files containing bacterial counts from different sample types (fecal, cecal, ileal) and generates plots and CSV outputs for each type.
 
 ---
 
@@ -28,9 +28,9 @@ project/
 ---
 
 
-## 📝 CSV File Format
+## CSV File Format
 
-Your CSV should include at least the following columns:
+Your CSV should include :
 
 * `mouse_ID` → unique identifier for each mouse
 * `sample_type` → type of sample (`fecal`, `cecal`, `ileal`)
@@ -49,7 +49,7 @@ M2;cecal;Placebo;1;8000
 ### What happens when you run it:
 
 1. The program checks and creates necessary folders (`output/`, `images/`)
-2. It reads the input CSV file
+2. It will reads the input CSV file
 3. Generates:
 
    * Fecal line plot and CSV
