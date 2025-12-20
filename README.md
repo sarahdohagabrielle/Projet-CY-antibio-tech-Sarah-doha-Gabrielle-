@@ -1,147 +1,67 @@
-# Projet-CY-antibio-tech-Sarah-doha-Gabrielle-
-On étudie comment un traitement antibiotique donné à des souris au début de leur vie influence leur microbiote, en comparant un groupe traité avec un antibiotique à un groupe témoin recevant un placebo
+## Overview
 
-from matplotlib import pyplot as plt
-import math
-import random  # jitter
-import os # folders managment
-import csv # csv files creation
-    
-cecal_abx = []
-cecal_plb = []
-ileal_abx = []
-ileal_plb = []
-fecal_mouse = {} 
+This project analyzes microbiome data from mice. It reads CSV files containing bacterial counts from different sample types (fecal, cecal, ileal) and generates **plots** and **CSV outputs** for each type.
 
-# step 1 : path creation
+---
 
-newpath = "output"
-if not os.path.exists(newpath):
-    os.makedirs(newpath)
-newpath = 'images'   
-if not os.path.exists(newpath):
-    os.makedirs(newpath)
-    
-#csv files creation 
+## Features
 
-file_ileal = open('output/ileal.csv', 'w+', newline='', encoding='utf-8')
-file_cecal = open('output/cecal.csv', 'w+', newline='', encoding='utf-8')
-file_fecal = open('output/fecal.csv', 'w+', newline='', encoding='utf-8')
-# creates csv writer
-writer_ileal = csv.writer(file_ileal)
-writer_cecal = csv.writer(file_cecal)
-writer_fecal = csv.writer(file_fecal)
+* Reads CSV data automatically, detects delimiters (`;` or `,`)
+* Processes fecal data and generates line plots over time
+* Processes cecal and ileal and generates violin plots to compare Placebo vs ABX treatments
+* Saves filtered data in CSV files
+* Creates all necessary folders automatically
+
+---
+
+## Project Structure
+
+```text
+project/
+│
+├── main.py              # Main execution script
+├── input/               # Folder for input CSV files
+├── output/              # Folder where CSV outputs are saved
+└── images/              # Folder where plots are saved
+```
+
+---
 
 
-# open csv
-file_name = input("Please enter the file name: ")
-fd = open("input/"+file_name,"r")
+## 📝 CSV File Format
 
-# get csv delimiter 
-fd.readline()     
-line = fd.readline()
-if len(line.split(";"))==11:
-      delimiter = ";"
-else : 
-      delimiter = ","
+Your CSV should include at least the following columns:
 
-# step 2 : data processing 
-while line != '': # loop until empty line
-    line = line.replace("\n", "")
-    data = line.split(delimiter)
-     
-    # variable initialisation 
-    sample_type = data[2]
-    mouse_id = data[4]
-    treatment = data[5]
-    experimental_day = int(data[7])
-    value = math.log10(float(data[8]) + 1)
-    
-    if sample_type == 'cecal':
-        writer_cecal.writerow(data) 
-    
-        if treatment == 'ABX':
-            cecal_abx.append(value)
-        else:
-            cecal_plb.append(value)
-            
-   
-    if sample_type == 'ileal':
-        writer_ileal.writerow(data) 
-        if treatment == 'ABX':
-            ileal_abx.append(value)
-        else:
-            ileal_plb.append(value)
+* `mouse_ID` → unique identifier for each mouse
+* `sample_type` → type of sample (`fecal`, `cecal`, `ileal`)
+* `treatment` → treatment applied (`Placebo` or `ABX`)
+* `experimental_day` → day of the experiment (integer)
+* `counts_live_bacteria_per_wet_g` → bacterial count
 
-   
-    if sample_type == 'fecal':
-        writer_fecal.writerow(data) 
-        if mouse_id not in fecal_mouse:
-            # Bleu pour Placebo, Orange pour ABX
-            color = '#ff7f0e' if treatment == 'ABX' else '#1f77b4'
-            fecal_mouse[mouse_id] = {'x': [], 'y': [], 'c': color}
-        fecal_mouse[mouse_id]['x'].append(experimental_day)
-        fecal_mouse[mouse_id]['y'].append(value)
-    
-    line = fd.readline()
-fd.close()
-file_ileal.close()
-file_cecal.close()
-file_fecal.close()
+> Example:
 
-# GRAPHIQUE CECAL
-plt.figure(figsize=(6, 5))
-v = plt.violinplot([cecal_abx, cecal_plb])
+```csv
+mouse_ID;sample_type;treatment;experimental_day;counts_live_bacteria_per_wet_g
+M1;fecal;ABX;1;12000
+M2;cecal;Placebo;1;8000
+```
 
-# colors : ABX (index 0) en orange, Placebo (index 1) en bleu
-v['bodies'][0].set_facecolor('#ffcc99')
-v['bodies'][1].set_facecolor('#6699ff')
+### What happens when you run it:
 
-# Ajout des points gris avec jitter horizontal
-x_abx = [1 + random.uniform(-0.10, 0.10) for _ in cecal_abx]
-x_plb = [2 + random.uniform(-0.10, 0.10) for _ in cecal_plb]
-plt.scatter(x_abx, cecal_abx, color='orange', alpha=0.4, s=30, zorder=3)
-plt.scatter(x_plb, cecal_plb, color='blue', alpha=0.4, s=30, zorder=3)
+1. The program checks and creates necessary folders (`output/`, `images/`)
+2. It reads the input CSV file
+3. Generates:
 
-plt.title("Cecal live bacteria")
-plt.legend(['ABX','Placebo'], loc='lower right')
-plt.xlabel("Treatment")
-plt.ylabel("log10(live bacteria/wet g)")
-plt.grid(axis='y', linestyle='--', alpha=0.3)
-plt.savefig("images/cecal_results.png")
+   * **Fecal line plot** and CSV
+   * **Cecal violin plot** and CSV
+   * **Ileal violin plot** and CSV
+4. Saves outputs in `output/` and `images/`
 
-# GRAPHIQUE ILEAL
-plt.figure(figsize=(6, 5))
-v = plt.violinplot([ileal_abx, ileal_plb])
+---
+## notes and limitations
 
-v['bodies'][0].set_facecolor('#ffcc99')
-v['bodies'][1].set_facecolor('#6699ff')
+* The script does not handle missing values or wrong rows. 
 
-# Points avec jitter
-x_abx = [1 + random.uniform(-0.08, 0.08) for _ in ileal_abx]
-x_plb = [2 + random.uniform(-0.08, 0.08) for _ in ileal_plb]
-plt.scatter(x_abx, ileal_abx, color='orange', alpha=0.4, s=30, zorder=3)
-plt.scatter(x_plb, ileal_plb, color='blue', alpha=0.4, s=30, zorder=3)
+* The input must strictly follow the schema as described
 
-plt.title("Ileal live bacteria")
-plt.legend(['ABX','Placebo'], loc='lower right')
-plt.xlabel("Treatment")
-plt.ylabel("log10(live bacteria/wet g)")
-plt.grid(axis='y', linestyle='--', alpha=0.3)
-plt.savefig("images/ileal_results.png")
-# GRAPHIQUE FECAL
-plt.figure(figsize=(8, 6))
-for name in fecal_mouse:
-    infos = fecal_mouse[name]
-    plt.plot(infos['x'], infos['y'], color=infos['c'], alpha=0.4)
-plt.legend(['placebo','ABX'], loc='upper right')
-plt.title("Fecal live bacteria")
-plt.xlabel("washout day")
-plt.grid(linestyle='--', alpha=0.3)
-plt.ylabel("log10(live bacteria/wet g)")
-plt.savefig("images/fecal_results.png")
-
-plt.show()
-
-
-
+* Case Sensitivity: "Placebo" is different from "placebo"
