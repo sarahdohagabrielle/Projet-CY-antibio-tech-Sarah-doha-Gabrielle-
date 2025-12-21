@@ -19,6 +19,7 @@ if not os.path.exists(newpath):
     os.makedirs(newpath)
     
 #csv files creation 
+#open three output files for writing the filtered data for each sample type
 file_ileal = open('output/ileal.csv', 'w+', newline='', encoding='utf-8')
 file_cecal = open('output/cecal.csv', 'w+', newline='', encoding='utf-8')
 file_fecal = open('output/fecal.csv', 'w+', newline='', encoding='utf-8')
@@ -35,7 +36,7 @@ fd = open("input/"+file_name,"r")
 # get csv delimiter 
 fd.readline()     
 line = fd.readline()
-if len(line.split(";"))==11:
+if len(line.split(";"))==11:#check if the line has 11 columns when split by a semicolon
       delimiter = ";"
 else : 
       delimiter = ","
@@ -140,5 +141,6 @@ plt.ylabel("log10(live bacteria/wet g)")
 plt.savefig("images/fecal_results.png")
 
 plt.show()
+
 
 
