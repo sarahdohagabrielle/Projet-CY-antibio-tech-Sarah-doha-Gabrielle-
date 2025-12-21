@@ -80,6 +80,7 @@ while line != '': # loop until empty line
         fecal_mouse[mouse_id]['y'].append(value)
     
     line = fd.readline()
+ # close all file handles   
 fd.close()
 file_ileal.close()
 file_cecal.close()
@@ -139,4 +140,5 @@ plt.ylabel("log10(live bacteria/wet g)")
 plt.savefig("images/fecal_results.png")
 
 plt.show()
+
 
