@@ -11,7 +11,6 @@ ileal_plb = []
 fecal_mouse = {} 
 
 # step 1 : path creation
-
 newpath = "output"
 if not os.path.exists(newpath):
     os.makedirs(newpath)
@@ -20,7 +19,6 @@ if not os.path.exists(newpath):
     os.makedirs(newpath)
     
 #csv files creation 
-
 file_ileal = open('output/ileal.csv', 'w+', newline='', encoding='utf-8')
 file_cecal = open('output/cecal.csv', 'w+', newline='', encoding='utf-8')
 file_fecal = open('output/fecal.csv', 'w+', newline='', encoding='utf-8')
@@ -44,7 +42,7 @@ else :
 
 # step 2 : data processing 
 while line != '': # loop until empty line
-    line = line.replace("\n", "")
+    line = line.replace("\n", "") #remove newline character and split date
     data = line.split(delimiter)
      
     # variable initialisation 
@@ -52,8 +50,9 @@ while line != '': # loop until empty line
     mouse_id = data[4]
     treatment = data[5]
     experimental_day = int(data[7])
-    value = math.log10(float(data[8]) + 1)
-    
+    value = math.log10(float(data[8]) + 1)#log transformation of bacterial count
+
+    #cecal sample 
     if sample_type == 'cecal':
         writer_cecal.writerow(data) 
     
@@ -62,7 +61,7 @@ while line != '': # loop until empty line
         else:
             cecal_plb.append(value)
             
-   
+   #ileal sample 
     if sample_type == 'ileal':
         writer_ileal.writerow(data) 
         if treatment == 'ABX':
@@ -70,11 +69,11 @@ while line != '': # loop until empty line
         else:
             ileal_plb.append(value)
 
-   
+   #fecal sample 
     if sample_type == 'fecal':
         writer_fecal.writerow(data) 
         if mouse_id not in fecal_mouse:
-            # Bleu pour Placebo, Orange pour ABX
+            # blue for Placebo and orange for ABX
             color = '#ff7f0e' if treatment == 'ABX' else '#1f77b4'
             fecal_mouse[mouse_id] = {'x': [], 'y': [], 'c': color}
         fecal_mouse[mouse_id]['x'].append(experimental_day)
@@ -86,15 +85,15 @@ file_ileal.close()
 file_cecal.close()
 file_fecal.close()
 
-# GRAPHIQUE CECAL
+# Step 5 : cecal violin plot
 plt.figure(figsize=(6, 5))
 v = plt.violinplot([cecal_abx, cecal_plb])
 
-# colors : ABX (index 0) en orange, Placebo (index 1) en bleu
+# set colors : ABX (orange) and placebo (blue)
 v['bodies'][0].set_facecolor('#ffcc99')
 v['bodies'][1].set_facecolor('#6699ff')
 
-# Ajout des points gris avec jitter horizontal
+# add jittered scatter points 
 x_abx = [1 + random.uniform(-0.10, 0.10) for _ in cecal_abx]
 x_plb = [2 + random.uniform(-0.10, 0.10) for _ in cecal_plb]
 plt.scatter(x_abx, cecal_abx, color='orange', alpha=0.4, s=30, zorder=3)
@@ -107,14 +106,14 @@ plt.ylabel("log10(live bacteria/wet g)")
 plt.grid(axis='y', linestyle='--', alpha=0.3)
 plt.savefig("images/cecal_results.png")
 
-# GRAPHIQUE ILEAL
+# Step 6 : ileal violin plot 
 plt.figure(figsize=(6, 5))
 v = plt.violinplot([ileal_abx, ileal_plb])
 
 v['bodies'][0].set_facecolor('#ffcc99')
 v['bodies'][1].set_facecolor('#6699ff')
 
-# Points avec jitter
+# add jittered scatter points
 x_abx = [1 + random.uniform(-0.08, 0.08) for _ in ileal_abx]
 x_plb = [2 + random.uniform(-0.08, 0.08) for _ in ileal_plb]
 plt.scatter(x_abx, ileal_abx, color='orange', alpha=0.4, s=30, zorder=3)
@@ -126,7 +125,8 @@ plt.xlabel("Treatment")
 plt.ylabel("log10(live bacteria/wet g)")
 plt.grid(axis='y', linestyle='--', alpha=0.3)
 plt.savefig("images/ileal_results.png")
-# GRAPHIQUE FECAL
+
+# Step 7 : fecal time-course plot
 plt.figure(figsize=(8, 6))
 for name in fecal_mouse:
     infos = fecal_mouse[name]
@@ -139,3 +139,4 @@ plt.ylabel("log10(live bacteria/wet g)")
 plt.savefig("images/fecal_results.png")
 
 plt.show()
+
