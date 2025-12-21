@@ -1,7 +1,6 @@
 ## Overview
 
 This project analyzes microbiome data from mice. It reads CSV files containing bacterial counts from different sample types (fecal, cecal, ileal) and generates plots and CSV outputs for each type. The code will help us understand how antibiotics (ABX) affect bacteria levels compared to a placebo across three different areas: the fecal, cecal, and ileal samples.
----
 
 ## Features
 
