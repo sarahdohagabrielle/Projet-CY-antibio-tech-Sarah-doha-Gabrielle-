@@ -4,7 +4,7 @@ This project analyzes microbiome data from mice. It reads CSV files containing b
 
 ## Features
 
-* Reads CSV data automatically, detects delimiters (`;` or `,`)
+* Reads CSV data automatically, detects delimiters ( ; or ,)
 * Processes fecal data and generates line plots over time
 * Processes cecal and ileal and generates violin plots to compare Placebo vs ABX treatments
 * Saves filtered data in CSV files
@@ -16,10 +16,10 @@ This project analyzes microbiome data from mice. It reads CSV files containing b
 
 project 
 
-main.py   # Main execution script
-input/    # Folder for input CSV files
-output/   # Folder where CSV outputs are saved
-images/   # Folder where plots are saved
+* main.py   # Main execution script
+* input/    # Folder for input CSV files
+* output/   # Folder where CSV outputs are saved
+* images/   # Folder where plots are saved
 
 
 ## CSV File Format
