@@ -47,11 +47,11 @@ while line != '': # loop until empty line
     data = line.split(delimiter)
      
     # variable initialisation 
-    sample_type = data[2]
-    mouse_id = data[4]
-    treatment = data[5]
+    sample_type = data[2] # cecal, ileal or fecal
+    mouse_id = data[4] # identifier for each mouse
+    treatment = data[5] # ABX or Placebo
     experimental_day = int(data[7])
-    value = math.log10(float(data[8]) + 1)#log transformation of bacterial count
+    value = math.log10(float(data[8]) + 1)# log transformation of bacterial count (add 1 to because if the count is 0,(log(0) is undefined)
 
     #cecal sample 
     if sample_type == 'cecal':
@@ -129,7 +129,7 @@ plt.grid(axis='y', linestyle='--', alpha=0.3)
 plt.savefig("images/ileal_results.png")
 
 # Step 7 : fecal time-course plot
-plt.figure(figsize=(8, 6))
+plt.figure(figsize=(8, 6)) # loop through the dictionary to plot a line for each mouse
 for name in fecal_mouse:
     infos = fecal_mouse[name]
     plt.plot(infos['x'], infos['y'], color=infos['c'], alpha=0.4)
@@ -141,6 +141,7 @@ plt.ylabel("log10(live bacteria/wet g)")
 plt.savefig("images/fecal_results.png")
 
 plt.show()
+
 
 
 
